@@ -7,23 +7,10 @@ import { processUserMessage } from '@/lib/services/groq';
 import { get11zaService } from '@/lib/services/11za';
 import { logStructured, formatPhoneNumber } from '@/lib/utils';
 
-// 11za WhatsApp webhook payload - handles multiple format variations
-interface ElevenZaWebhookPayload {
-  from: string;
-  text?: string;
-  body?: string;
-  message?: string;
-  content?: string;
-  messageId?: string;
-  wamid?: string;
-  id?: string;
-  timestamp?: number;
-  type?: 'text' | 'button_response' | 'list_response';
-}
-
 /**
  * POST /api/webhook/11za
  * Receives WhatsApp messages from 11za
+ * Handles multiple payload format variations from 11za
  */
 export async function POST(request: NextRequest) {
   try {
