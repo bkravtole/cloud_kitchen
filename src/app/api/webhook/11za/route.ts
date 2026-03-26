@@ -7,7 +7,8 @@ import { processUserMessage } from '@/lib/services/groq';
 import { get11zaService } from '@/lib/services/11za';
 import { logStructured, errorResponse, formatPhoneNumber } from '@/lib/utils';
 
-interface 11zaWebhookPayload {
+// Change '11za' to 'ElevenZa' or 'Webhook11za'
+interface ElevenZaWebhookPayload {
   from: string;
   text: string;
   messageId: string;
@@ -22,7 +23,7 @@ interface 11zaWebhookPayload {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { from, text, messageId, type } = body as 11zaWebhookPayload;
+    const { from, text, messageId, type } = body as ElevenZaWebhookPayload;
 
     if (!from || !text || !messageId) {
       logStructured('warn', '11za webhook missing fields', { from, messageId });

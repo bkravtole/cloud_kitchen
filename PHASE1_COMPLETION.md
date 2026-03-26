@@ -161,7 +161,7 @@ import { CartService } from '@/lib/services/cart';
 import { processUserMessage } from '@/lib/services/groq';
 import { logStructured, errorResponse, verify11zaSignature, formatPhoneNumber } from '@/lib/utils';
 
-interface 11zaWebhookPayload {
+interface ElevenZaWebhookPayload {
   from: string;
   text: string;
   messageId: string;
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
     //   return NextResponse.json({ success: false }, { status: 401 });
     // }
 
-    const payload: 11zaWebhookPayload = JSON.parse(body);
+    const payload: ElevenZaWebhookPayload = JSON.parse(body);
     const { from, text, messageId, type } = payload;
 
     logStructured('info', '11za message received', {
@@ -878,7 +878,7 @@ import { CartService } from '@/lib/services/cart';
 import { processUserMessage } from '@/lib/services/groq';
 import { logStructured, errorResponse, verify11zaSignature, formatPhoneNumber } from '@/lib/utils';
 
-interface 11zaWebhookPayload {
+interface ElevenZaWebhookPayload {
   from: string;
   text: string;
   messageId: string;
@@ -903,7 +903,7 @@ export async function POST(request: NextRequest) {
     //   return NextResponse.json({ success: false }, { status: 401 });
     // }
 
-    const payload: 11zaWebhookPayload = JSON.parse(body);
+    const payload: ElevenZaWebhookPayload = JSON.parse(body);
     const { from, text, messageId, type } = payload;
 
     logStructured('info', '11za message received', {
