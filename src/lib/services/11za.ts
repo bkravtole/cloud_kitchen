@@ -24,29 +24,29 @@ export class ElevenZaService {
 
   /**
    * Format phone number for 11za API
-   * 11za expects: +91XXXXXXXXXX format
+   * 11za expects: 91XXXXXXXXXX format (without + prefix based on error)
    */
   private formatPhoneFor11za(phone: string): string {
     // Remove all non-digits
     const cleaned = phone.replace(/\D/g, '');
     
-    // If already 12 digits and starts with 91, add +
+    // If already 12 digits and starts with 91, return as is (no + prefix)
     if (cleaned.length === 12 && cleaned.startsWith('91')) {
-      return `+${cleaned}`;
+      return cleaned;
     }
     
-    // If 10 digits (without country code), add +91
+    // If 10 digits (without country code), add 91
     if (cleaned.length === 10) {
-      return `+91${cleaned}`;
+      return `91${cleaned}`;
     }
     
-    // If already has +, return as is
-    if (phone.startsWith('+')) {
-      return phone;
+    // If already starts with 91, just return
+    if (cleaned.startsWith('91')) {
+      return cleaned;
     }
     
-    // Default: try adding +91
-    return `+91${cleaned}`;
+    // Default: try adding 91
+    return `91${cleaned}`;
   }
 
   async sendTextMessage(to: string, text: string): Promise<string> {

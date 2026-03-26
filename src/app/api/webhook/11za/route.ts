@@ -23,18 +23,33 @@ export async function POST(request: NextRequest) {
     // Try multiple field names for message content
     let text = body.text || body.body || body.message || '';
     
-    // 11za real payload has 'content' field
+    // 11za real payload has 'content' field (might be object or string)
     if (!text && body.content) {
-      text = typeof body.content === 'string' 
-        ? body.content 
-        : JSON.stringify(body.content);
+      if (typeof body.content === 'string') {
+        text = body.content;
+      } else if (typeof body.content === 'object') {
+        // Log the structure to understand it better
+        logStructured('info', '11za content is object', {
+          contentKeys: Object.keys(body.content),
+          contentType: typeof body.content,
+          contentBody: JSON.stringify(body.content).substring(0, 300),
+        });
+        
+        // Try common nested field names
+        text = body.content.text 
+          || body.content.message 
+          || body.content.body
+          || body.content.msg
+          || JSON.stringify(body.content);
+      }
     }
 
     logStructured('info', '11za webhook received', {
       from,
       messageId,
       textProvided: !!text,
-      contentField: body.content ? typeof body.content : 'missing',
+      textLength: text.length,
+      contentFieldType: typeof body.content,
       bodyKeys: Object.keys(body),
     });
 
