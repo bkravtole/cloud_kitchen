@@ -24,7 +24,17 @@ export class ElevenZaService {
 
   async sendTextMessage(to: string, text: string): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/send_message`, {
+      const url = `${this.baseUrl}/sendMessage/sendMessages`;
+      
+      logStructured('info', '11za sendTextMessage starting', {
+        to,
+        textLength: text.length,
+        url,
+        apiKeyLength: this.apiKey.length,
+        baseUrl: this.baseUrl,
+      });
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -36,8 +46,21 @@ export class ElevenZaService {
         }),
       });
 
+      logStructured('info', '11za response received', {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText,
+      });
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        const errorText = await response.text();
+        logStructured('error', '11za API error response', {
+          status: response.status,
+          statusText: response.statusText,
+          errorBody: errorText.substring(0, 200),
+          url,
+        });
+        throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
       }
 
       const data: any = await response.json();
@@ -47,8 +70,13 @@ export class ElevenZaService {
       });
 
       return data.messageId;
-    } catch (error) {
-      logStructured('error', '11za send error', { error, to });
+    } catch (error: any) {
+      logStructured('error', '11za send error', { 
+        error: error?.message || String(error),
+        to,
+        baseUrl: this.baseUrl,
+        apiKeySet: !!this.apiKey
+      });
       throw error;
     }
   }
