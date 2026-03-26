@@ -18,13 +18,23 @@ export async function POST(request: NextRequest) {
     
     // Extract fields from various possible formats
     const from = body.from || body.sender || body.phone;
-    const text = body.text || body.body || body.message || body.content || '';
     const messageId = body.messageId || body.wamid || body.id || '';
+    
+    // Try multiple field names for message content
+    let text = body.text || body.body || body.message || '';
+    
+    // 11za real payload has 'content' field
+    if (!text && body.content) {
+      text = typeof body.content === 'string' 
+        ? body.content 
+        : JSON.stringify(body.content);
+    }
 
     logStructured('info', '11za webhook received', {
       from,
       messageId,
       textProvided: !!text,
+      contentField: body.content ? typeof body.content : 'missing',
       bodyKeys: Object.keys(body),
     });
 
@@ -43,14 +53,18 @@ export async function POST(request: NextRequest) {
         from,
         messageId,
         type: body.type,
+        bodyKeys: Object.keys(body),
       });
       
       // Still send acknowledgment but don't process
       const ackMessage = "Thanks for your message! Please send a text description of what you'd like to order.";
       try {
         await get11zaService().sendTextMessage(from, ackMessage);
-      } catch (e) {
-        logStructured('error', 'Failed to send ack message', { error: e });
+      } catch (e: any) {
+        logStructured('error', 'Failed to send ack message', { 
+          error: e?.message || String(e),
+          stack: e?.stack 
+        });
       }
       
       return NextResponse.json({ success: true }, { status: 200 });
@@ -64,7 +78,19 @@ export async function POST(request: NextRequest) {
     });
 
     try {
-      const fromPhone = formatPhoneNumber(from);
+      // Validate and format phone number
+      let fromPhone: string;
+      try {
+        fromPhone = formatPhoneNumber(from);
+      } catch (phoneError: any) {
+        logStructured('warn', 'Phone number format error', {
+          originalNumber: from,
+          error: phoneError?.message
+        });
+        // Use raw phone number if formatting fails
+        fromPhone = from.replace(/\D/g, '');
+      }
+      
       const restaurantId = 'rest_001'; // TODO: Get from user preferences/database
 
       const { db } = await connectToDatabase();
@@ -125,13 +151,21 @@ export async function POST(request: NextRequest) {
       await get11zaService().sendTextMessage(fromPhone, responseMessage);
 
       return NextResponse.json({ success: true }, { status: 200 });
-    } catch (processError) {
-      logStructured('error', 'Error processing 11za message', { processError });
+    } catch (processError: any) {
+      logStructured('error', 'Error processing 11za message', { 
+        error: processError?.message || String(processError),
+        stack: processError?.stack,
+        type: typeof processError
+      });
       // Still return 200 to acknowledge receipt
       return NextResponse.json({ success: true }, { status: 200 });
     }
-  } catch (error) {
-    logStructured('error', '11za webhook error', { error });
+  } catch (error: any) {
+    logStructured('error', '11za webhook error', { 
+      error: error?.message || String(error),
+      stack: error?.stack,
+      type: typeof error
+    });
     return NextResponse.json({ success: true }, { status: 200 }); // Always return 200
   }
 }
