@@ -16,10 +16,12 @@ export interface ListMessage {
 export class ElevenZaService {
   private apiKey: string;
   private baseUrl: string;
+  private originWebsite: string;
 
   constructor() {
     this.apiKey = process.env.ELEVENZA_API_KEY || '';
     this.baseUrl = process.env.ELEVENZA_BASE_URL || '';
+    this.originWebsite = process.env.ELEVANZA_ORIGIN_WEBSITE || '';
   }
 
   /**
@@ -51,28 +53,37 @@ export class ElevenZaService {
 
   async sendTextMessage(to: string, text: string): Promise<string> {
     try {
-      // Format phone number for 11za - should be +91XXXXXXXXXX
-      const formattedPhone = this.formatPhoneFor11za(to);
+      // Format phone number for 11za
+      const sendto = this.formatPhoneFor11za(to);
       const url = `${this.baseUrl}/sendMessage/sendMessages`;
       
       logStructured('info', '11za sendTextMessage starting', {
         originalPhone: to,
-        formattedPhone,
+        sendto,
         textLength: text.length,
         url,
-        apiKeyLength: this.apiKey.length,
+      });
+
+      // Use correct 11za API payload format
+      const payload = {
+        sendto,
+        authToken: this.apiKey,
+        originWebsite: this.originWebsite,
+        contentType: 'text',
+        text,
+      };
+
+      logStructured('info', '11za payload prepared', {
+        sendto,
+        payloadKeys: Object.keys(payload),
       });
 
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          to: formattedPhone,
-          text,
-        }),
+        body: JSON.stringify(payload),
       });
 
       logStructured('info', '11za response received', {
@@ -87,25 +98,24 @@ export class ElevenZaService {
           status: response.status,
           statusText: response.statusText,
           errorBody: errorText.substring(0, 200),
-          url,
-          formattedPhone,
+          sendto,
         });
         throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
       }
 
       const data: any = await response.json();
       logStructured('info', '11za text message sent', {
-        to: formattedPhone,
-        messageId: data.messageId,
+        sendto,
+        messageId: data.messageId || data.id || 'success',
       });
 
-      return data.messageId;
+      return data.messageId || data.id || 'sent';
     } catch (error: any) {
       logStructured('error', '11za send error', { 
         error: error?.message || String(error),
         to,
-        baseUrl: this.baseUrl,
-        apiKeySet: !!this.apiKey
+        apiKeySet: !!this.apiKey,
+        originWebsiteSet: !!this.originWebsite,
       });
       throw error;
     }

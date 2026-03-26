@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify signature
-    // const isValid = verify11zaSignature(body, signature, process.env.11ZA_WEBHOOK_SECRET!);
+    // const isValid = verify11zaSignature(body, signature, process.env.ELEVANZA_WEBHOOK_SECRET!);
     // if (!isValid) {
     //   logStructured('warn', '11za webhook invalid signature');
     //   return NextResponse.json({ success: false }, { status: 401 });
@@ -897,7 +897,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify signature
-    // const isValid = verify11zaSignature(body, signature, process.env.11ZA_WEBHOOK_SECRET!);
+    // const isValid = verify11zaSignature(body, signature, process.env.ELEVANZA_WEBHOOK_SECRET!);
     // if (!isValid) {
     //   logStructured('warn', '11za webhook invalid signature');
     //   return NextResponse.json({ success: false }, { status: 401 });

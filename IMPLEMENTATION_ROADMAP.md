@@ -338,7 +338,7 @@ async function verifySignature(
   signature: string
 ): Promise<boolean> {
   const hash = crypto
-    .createHmac("sha256", process.env.11ZA_WEBHOOK_SECRET!)
+    .createHmac("sha256", process.env.ELEVANZA_WEBHOOK_SECRET!)
     .update(body)
     .digest("hex");
   return hash === signature;
@@ -782,7 +782,7 @@ MONGODB_URI=
 GROQ_API_KEY=
 GROQ_MODEL=
 ELEVENZA_API_KEY=
-11ZA_WEBHOOK_SECRET=
+ELEVANZA_WEBHOOK_SECRET=
 RAZORPAY_KEY_ID=
 RAZORPAY_KEY_SECRET=
 RAZORPAY_WEBHOOK_SECRET=
@@ -1192,7 +1192,7 @@ async function verifySignature(
   signature: string
 ): Promise<boolean> {
   const hash = crypto
-    .createHmac("sha256", process.env.11ZA_WEBHOOK_SECRET!)
+    .createHmac("sha256", process.env.ELEVANZA_WEBHOOK_SECRET!)
     .update(body)
     .digest("hex");
   return hash === signature;
@@ -1636,7 +1636,7 @@ MONGODB_URI=
 GROQ_API_KEY=
 GROQ_MODEL=
 ELEVENZA_API_KEY=
-11ZA_WEBHOOK_SECRET=
+ELEVANZA_WEBHOOK_SECRET=
 RAZORPAY_KEY_ID=
 RAZORPAY_KEY_SECRET=
 RAZORPAY_WEBHOOK_SECRET=
