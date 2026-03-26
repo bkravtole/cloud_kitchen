@@ -439,8 +439,8 @@ curl -X PATCH http://localhost:3000/api/order/ord_.../status ...
 - Verify amount > 0
 
 ### "11za send failed"
-- Check 11ZA_API_KEY and 11ZA_BASE_URL
-- Verify endpoint: `{11ZA_BASE_URL}/send_message`
+- Check ELEVENZA_API_KEY and ELEVENZA_BASE_URL
+- Verify endpoint: `{ELEVENZA_BASE_URL}/send_message`
 - Check phone number format (91 + 10 digits)
 
 ### "Webhook signature invalid"

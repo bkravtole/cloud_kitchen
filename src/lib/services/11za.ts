@@ -1,12 +1,12 @@
 import { logStructured } from '@/lib/utils';
 
-export interface 11zaButtonMessage {
+export interface ButtonMessage {
   to: string;
   text: string;
   buttons: Array<{ id: string; title: string }>;
 }
 
-export interface 11zaListMessage {
+export interface ListMessage {
   to: string;
   title: string;
   body: string;
@@ -18,8 +18,8 @@ export class ElevenZaService {
   private baseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.11ZA_API_KEY || '';
-    this.baseUrl = process.env.11ZA_BASE_URL || '';
+    this.apiKey = process.env.ELEVENZA_API_KEY || '';
+    this.baseUrl = process.env.ELEVENZA_BASE_URL || '';
   }
 
   async sendTextMessage(to: string, text: string): Promise<string> {
@@ -53,7 +53,7 @@ export class ElevenZaService {
     }
   }
 
-  async sendButtonMessage(params: 11zaButtonMessage): Promise<string> {
+  async sendButtonMessage(params: ButtonMessage): Promise<string> {
     try {
       const response = await fetch(`${this.baseUrl}/send_message`, {
         method: 'POST',
@@ -82,7 +82,7 @@ export class ElevenZaService {
     }
   }
 
-  async sendListMessage(params: 11zaListMessage): Promise<string> {
+  async sendListMessage(params: ListMessage): Promise<string> {
     try {
       const response = await fetch(`${this.baseUrl}/send_message`, {
         method: 'POST',

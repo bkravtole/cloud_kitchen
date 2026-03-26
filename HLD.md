@@ -1092,7 +1092,7 @@ db.restaurant_admins.insertOne({
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cloudkitchen
 GROQ_API_KEY=gsk_xxxxxxxxxxxxx
 GROQ_MODEL_ID=mixtral-8x7b-32768
-11ZA_API_KEY=xxxx
+ELEVENZA_API_KEY=xxxx
 11ZA_WEBHOOK_SECRET=xxxx
 RAZORPAY_KEY_ID=xxxxx
 RAZORPAY_KEY_SECRET=xxxxx
@@ -2271,7 +2271,7 @@ db.restaurant_admins.insertOne({
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cloudkitchen
 GROQ_API_KEY=gsk_xxxxxxxxxxxxx
 GROQ_MODEL_ID=mixtral-8x7b-32768
-11ZA_API_KEY=xxxx
+ELEVENZA_API_KEY=xxxx
 11ZA_WEBHOOK_SECRET=xxxx
 RAZORPAY_KEY_ID=xxxxx
 RAZORPAY_KEY_SECRET=xxxxx

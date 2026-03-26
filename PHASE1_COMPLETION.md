@@ -248,10 +248,10 @@ export async function POST(request: NextRequest) {
 
 async function send11zaMessage(toPhone: string, message: string): Promise<void> {
   try {
-    const response = await fetch(`${process.env.11ZA_BASE_URL}/send_message`, {
+    const response = await fetch(`${process.env.ELEVENZA_BASE_URL}/send_message`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.11ZA_API_KEY}`,
+        'Authorization': `Bearer ${process.env.ELEVENZA_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -295,8 +295,8 @@ export class ElevenZaService {
   private baseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.11ZA_API_KEY || '';
-    this.baseUrl = process.env.11ZA_BASE_URL || '';
+    this.apiKey = process.env.ELEVENZA_API_KEY || '';
+    this.baseUrl = process.env.ELEVENZA_BASE_URL || '';
   }
 
   async sendMessage(to: string, message: 11zaMessage): Promise<string> {
@@ -965,10 +965,10 @@ export async function POST(request: NextRequest) {
 
 async function send11zaMessage(toPhone: string, message: string): Promise<void> {
   try {
-    const response = await fetch(`${process.env.11ZA_BASE_URL}/send_message`, {
+    const response = await fetch(`${process.env.ELEVENZA_BASE_URL}/send_message`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.11ZA_API_KEY}`,
+        'Authorization': `Bearer ${process.env.ELEVENZA_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -1012,8 +1012,8 @@ export class ElevenZaService {
   private baseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.11ZA_API_KEY || '';
-    this.baseUrl = process.env.11ZA_BASE_URL || '';
+    this.apiKey = process.env.ELEVENZA_API_KEY || '';
+    this.baseUrl = process.env.ELEVENZA_BASE_URL || '';
   }
 
   async sendMessage(to: string, message: 11zaMessage): Promise<string> {

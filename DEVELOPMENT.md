@@ -63,7 +63,7 @@ cp .env.example .env.local
 # Fill in the required variables:
 # - MONGODB_URI: MongoDB Atlas connection string
 # - GROQ_API_KEY: Get from https://console.groq.com
-# - 11ZA_API_KEY: Get from https://11za.com
+# - ELEVENZA_API_KEY: Get from https://11za.com
 # - RAZORPAY_KEY_ID & RAZORPAY_KEY_SECRET: Get from https://dashboard.razorpay.com
 ```
 
@@ -443,7 +443,7 @@ cp .env.example .env.local
 # Fill in the required variables:
 # - MONGODB_URI: MongoDB Atlas connection string
 # - GROQ_API_KEY: Get from https://console.groq.com
-# - 11ZA_API_KEY: Get from https://11za.com
+# - ELEVENZA_API_KEY: Get from https://11za.com
 # - RAZORPAY_KEY_ID & RAZORPAY_KEY_SECRET: Get from https://dashboard.razorpay.com
 ```
 

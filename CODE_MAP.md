@@ -165,7 +165,7 @@ await get11zaService().sendTextMessage(
 **11za API Call:**
 ```
 POST https://internal.11za.in/apis/send_message
-Authorization: Bearer {11ZA_API_KEY}
+Authorization: Bearer {ELEVENZA_API_KEY}
 {
   to: "919876543210",
   text: "Perfect! I found..."
@@ -1165,7 +1165,7 @@ await get11zaService().sendTextMessage(
 **11za API Call:**
 ```
 POST https://internal.11za.in/apis/send_message
-Authorization: Bearer {11ZA_API_KEY}
+Authorization: Bearer {ELEVENZA_API_KEY}
 {
   to: "919876543210",
   text: "Perfect! I found..."
