@@ -7,12 +7,17 @@ import { processUserMessage } from '@/lib/services/groq';
 import { get11zaService } from '@/lib/services/11za';
 import { logStructured, formatPhoneNumber } from '@/lib/utils';
 
-// Change '11za' to 'ElevenZa' or 'Webhook11za'
+// 11za WhatsApp webhook payload - handles multiple format variations
 interface ElevenZaWebhookPayload {
   from: string;
-  text: string;
-  messageId: string;
-  timestamp: number;
+  text?: string;
+  body?: string;
+  message?: string;
+  content?: string;
+  messageId?: string;
+  wamid?: string;
+  id?: string;
+  timestamp?: number;
   type?: 'text' | 'button_response' | 'list_response';
 }
 
@@ -23,18 +28,52 @@ interface ElevenZaWebhookPayload {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { from, text, messageId, type } = body as ElevenZaWebhookPayload;
+    
+    // Extract fields from various possible formats
+    const from = body.from || body.sender || body.phone;
+    const text = body.text || body.body || body.message || body.content || '';
+    const messageId = body.messageId || body.wamid || body.id || '';
 
-    if (!from || !text || !messageId) {
-      logStructured('warn', '11za webhook missing fields', { from, messageId });
+    logStructured('info', '11za webhook received', {
+      from,
+      messageId,
+      textProvided: !!text,
+      bodyKeys: Object.keys(body),
+    });
+
+    if (!from || !messageId) {
+      logStructured('warn', '11za webhook missing required fields', { 
+        from, 
+        messageId,
+        allData: body 
+      });
       return NextResponse.json({ success: true }, { status: 200 }); // Return 200 to ack
     }
 
-    logStructured('info', '11za message received', {
+    // If no text, it might be a media/button message
+    if (!text) {
+      logStructured('warn', '11za webhook: no text content', {
+        from,
+        messageId,
+        type: body.type,
+      });
+      
+      // Still send acknowledgment but don't process
+      const ackMessage = "Thanks for your message! Please send a text description of what you'd like to order.";
+      try {
+        await get11zaService().sendTextMessage(from, ackMessage);
+      } catch (e) {
+        logStructured('error', 'Failed to send ack message', { error: e });
+      }
+      
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
+
+    logStructured('info', '11za message received with text', {
       from,
       messageId,
-      text: text.substring(0, 50),
-      type,
+      textLength: text.length,
+      textPreview: text.substring(0, 50),
     });
 
     try {
