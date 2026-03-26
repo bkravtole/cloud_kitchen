@@ -41,8 +41,8 @@ export async function GET(request: Request) {
     }
 
     const db = await connectToDatabase();
-    const ordersCollection = db.collection('orders');
-    const restaurantsCollection = db.collection('restaurants');
+    const ordersCollection = db.db.collection('orders');
+    const restaurantsCollection = db.db.collection('restaurants');
 
     // Get total count
     const total = await ordersCollection.countDocuments({

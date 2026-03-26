@@ -3,7 +3,6 @@ import {
   IDeliveryBoy,
   IDeliveryAssignment,
   DeliveryBoyStatus,
-  ILocationUpdate,
 } from '@/types';
 import { logStructured } from '@/lib/utils';
 
@@ -13,7 +12,7 @@ export class DeliveryService {
   /**
    * Register a new delivery boy
    */
-  async createDeliveryBoy(data: Omit<IDeliveryBoy, '_id' | 'createdAt' | 'updatedAt'>) {
+  async createDeliveryBoy(data: Omit<IDeliveryBoy, '_id' | 'deliveryBoyId' | 'createdAt' | 'updatedAt'>) {
     const deliveryBoy: IDeliveryBoy = {
       ...data,
       deliveryBoyId: `db_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -21,7 +20,7 @@ export class DeliveryService {
       updatedAt: new Date(),
     };
 
-    const result = await this.db.collection('delivery_boys').insertOne(deliveryBoy as any);
+    await this.db.collection('delivery_boys').insertOne(deliveryBoy as any);
 
     logStructured('info', 'Delivery boy created', {
       deliveryBoyId: deliveryBoy.deliveryBoyId,
@@ -45,14 +44,14 @@ export class DeliveryService {
   async getAvailableDeliveryBoys(restaurantId: string): Promise<IDeliveryBoy[]> {
     const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
 
-    return this.db
+    return (await this.db
       .collection('delivery_boys')
       .find({
         restaurantId,
         status: DeliveryBoyStatus.ONLINE,
         lastLocationUpdate: { $gte: sixHoursAgo },
       })
-      .toArray() as Promise<IDeliveryBoy[]>;
+      .toArray()) as any as IDeliveryBoy[];
   }
 
   /**
@@ -61,8 +60,7 @@ export class DeliveryService {
   async updateLocation(
     deliveryBoyId: string,
     latitude: number,
-    longitude: number,
-    accuracy?: number
+    longitude: number
   ) {
     const result = await this.db.collection('delivery_boys').updateOne(
       { deliveryBoyId },
@@ -181,7 +179,7 @@ export class DeliveryService {
       updatedAt: new Date(),
     };
 
-    const result = await this.db.collection('delivery_assignments').insertOne(assignment as any);
+    await this.db.collection('delivery_assignments').insertOne(assignment as any);
 
     logStructured('info', 'Delivery assigned', {
       assignmentId: assignment.assignmentId,
@@ -197,20 +195,20 @@ export class DeliveryService {
    * Get assignment by order ID
    */
   async getAssignmentByOrderId(orderId: string): Promise<IDeliveryAssignment | null> {
-    return this.db.collection('delivery_assignments').findOne({ orderId });
+    return (await this.db.collection('delivery_assignments').findOne({ orderId })) as any as IDeliveryAssignment | null;
   }
 
   /**
    * Get active assignments for delivery boy
    */
   async getActiveAssignments(deliveryBoyId: string): Promise<IDeliveryAssignment[]> {
-    return this.db
+    return (await this.db
       .collection('delivery_assignments')
       .find({
         deliveryBoyId,
         status: { $in: ['ASSIGNED', 'PICKED_UP', 'IN_TRANSIT'] },
       })
-      .toArray() as Promise<IDeliveryAssignment[]>;
+      .toArray()) as any as IDeliveryAssignment[];
   }
 
   /**

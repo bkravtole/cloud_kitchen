@@ -14,7 +14,7 @@ import { sseManager } from '@/lib/sse/connectionManager';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { deliveryBoyId, latitude, longitude, accuracy, restaurantId } = body;
+    const { deliveryBoyId, latitude, longitude, restaurantId } = body;
 
     if (!deliveryBoyId || latitude === undefined || longitude === undefined) {
       return NextResponse.json(
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const deliveryService = new DeliveryService(db);
 
     // Update location
-    await deliveryService.updateLocation(deliveryBoyId, latitude, longitude, accuracy);
+    await deliveryService.updateLocation(deliveryBoyId, latitude, longitude);
 
     // Get active assignments for this delivery boy
     const assignments = await deliveryService.getActiveAssignments(deliveryBoyId);

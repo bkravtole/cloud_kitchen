@@ -21,8 +21,9 @@ export class OrderService {
   ): Promise<{ order: IOrder; paymentLink?: string }> {
     try {
       const orderId = generateOrderId();
+      // Added Math.round to subtotal to prevent floating point issues
       const subtotal = items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
+        (sum, item) => sum + Math.round(item.price * item.quantity),
         0
       );
       const tax = Math.round(subtotal * 0.05);
@@ -47,7 +48,8 @@ export class OrderService {
         updatedAt: new Date(),
       };
 
-      const result = await this.db.collection<IOrder>('orders').insertOne(newOrder as any);
+      // Cast to any for the insert if your IOrder interface is strict with MongoDB _id
+      await this.db.collection<IOrder>('orders').insertOne(newOrder as any);
 
       logStructured('info', 'Order created', {
         orderId,
@@ -56,8 +58,7 @@ export class OrderService {
         total,
       });
 
-      // Generate payment link
-      let paymentLink;
+      let paymentLink: string | undefined;
       try {
         const razorpayService = getRazorpayService();
         const { shortUrl, razorpayOrderId } = await razorpayService.generatePaymentLink({
@@ -70,7 +71,6 @@ export class OrderService {
           redirectUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/payment/success?orderId=${orderId}`,
         });
 
-        // Update order with razorpay ID
         await this.db.collection<IOrder>('orders').updateOne(
           { orderId },
           {
@@ -83,7 +83,6 @@ export class OrderService {
         paymentLink = shortUrl;
       } catch (error) {
         logStructured('warn', 'Payment link generation failed', { error, orderId });
-        // Continue without payment link - can retry later
       }
 
       return {
@@ -138,21 +137,21 @@ export class OrderService {
     restaurantId: string,
     newStatus: OrderStatus
   ): Promise<IOrder | null> {
-    return (
-      await this.db.collection<IOrder>('orders').findOneAndUpdate(
-        { orderId, restaurantId },
-        {
-          $set: {
-            status: newStatus,
-            updatedAt: new Date(),
-            ...(newStatus === OrderStatus.DELIVERED && {
-              completedAt: new Date(),
-            }),
-          },
+    const result = await this.db.collection<IOrder>('orders').findOneAndUpdate(
+      { orderId, restaurantId },
+      {
+        $set: {
+          status: newStatus,
+          updatedAt: new Date(),
+          ...(newStatus === OrderStatus.DELIVERED && {
+            completedAt: new Date(),
+          }),
         },
-        { returnDocument: 'after' }
-      )
-    ).value as IOrder | null;
+      },
+      { returnDocument: 'after' }
+    );
+    // Updated: In modern MongoDB driver, the object itself is returned or null
+    return (result as unknown as IOrder) || null;
   }
 
   async updatePaymentStatus(
@@ -162,20 +161,21 @@ export class OrderService {
   ): Promise<IOrder | null> {
     const newOrderStatus = status === 'AUTHORIZED' ? OrderStatus.CONFIRMED : OrderStatus.FAILED;
 
-    return (
-      await this.db.collection<IOrder>('orders').findOneAndUpdate(
-        { orderId },
-        {
-          $set: {
-            paymentStatus: status,
-            paymentId,
-            status: newOrderStatus,
-            updatedAt: new Date(),
-          },
+    const result = await this.db.collection<IOrder>('orders').findOneAndUpdate(
+      { orderId },
+      {
+        $set: {
+          paymentStatus: status,
+          paymentId,
+          status: newOrderStatus,
+          updatedAt: new Date(),
         },
-        { returnDocument: 'after' }
-      )
-    ).value as IOrder | null;
+      },
+      { returnDocument: 'after' }
+    );
+
+    // FIXED: Removed '.value' as it is no longer used in modern MongoDB driver results
+    return (result as unknown as IOrder) || null;
   }
 }
 

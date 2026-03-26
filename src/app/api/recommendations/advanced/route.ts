@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
+import { IMenuItem } from '@/types';
 import {
   getAdvancedRecommendations,
   getMealCombinations,
@@ -51,15 +52,15 @@ export async function GET(request: Request) {
       );
     }
 
-    const db = await connectToDatabase();
+    const { db } = await connectToDatabase();
     const menusCollection = db.collection('menus');
     const ordersCollection = db.collection('orders');
 
     // Get available menu
-    const menu = await menusCollection
+    const menu = (await menusCollection
       .find({ restaurantId, isAvailable: true })
       .limit(100)
-      .toArray();
+      .toArray()) as any[] as IMenuItem[];
 
     if (menu.length === 0) {
       return NextResponse.json({
@@ -134,7 +135,6 @@ export async function GET(request: Request) {
 
       // Get AI recommendations
       const personalized = await getAdvancedRecommendations(
-        userPhone,
         userPreferences,
         orderPatterns,
         menu,

@@ -9,8 +9,6 @@ import crypto from 'crypto';
 /**
  * POST /api/payment/webhook
  * Razorpay webhook for payment confirmation
- * 
- * Verify signature before processing
  */
 export async function POST(request: NextRequest) {
   try {
@@ -22,9 +20,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false }, { status: 400 });
     }
 
-    // Verify signature
+    // 1. Verify Signature
+    const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret) {
+      logStructured('error', 'RAZORPAY_KEY_SECRET is not defined');
+      return NextResponse.json({ success: false }, { status: 500 });
+    }
+
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
+      .createHmac('sha256', secret)
       .update(body)
       .digest('hex');
 
@@ -33,80 +37,54 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false }, { status: 401 });
     }
 
+    // 2. Parse Payload
     const payload = JSON.parse(body);
     const { event, payload: data } = payload;
+    
+    // Razorpay sends payment data inside nested objects (e.g., data.payment.entity)
+    const paymentEntity = data?.payment?.entity;
+    const orderId = paymentEntity?.notes?.orderId;
+    const paymentId = paymentEntity?.id;
 
     logStructured('info', 'Razorpay webhook received', {
       event,
-      paymentLinkId: data?.payment_link?.id,
+      orderId,
+      paymentId,
     });
 
     const { db } = await connectToDatabase();
     const orderService = new OrderService(db);
 
-    if (event === 'payment.authorized' || event === 'payment.captured') {
-      const orderId = data.notes?.orderId;
-      const paymentId = data.id;
-      const amount = data.amount ? data.amount / 100 : 0;
-
+    // 3. Process Events
+    if (event === 'payment.captured' || event === 'payment.authorized') {
       if (!orderId) {
-        logStructured('warn', 'Payment webhook missing orderId');
+        logStructured('warn', 'Payment webhook missing orderId in notes');
         return NextResponse.json({ success: true }, { status: 200 });
       }
 
-      // Find order to get restaurantId
-      const order = await db.collection('orders').findOne({ orderId });
-      if (!order) {
-        logStructured('warn', 'Order not found for payment', { orderId });
-        return NextResponse.json({ success: true }, { status: 200 });
-      }
-
-      // Update payment status
+      // Update payment status in DB
       await orderService.updatePaymentStatus(orderId, paymentId, 'AUTHORIZED');
 
-      logStructured('info', 'Payment confirmed', {
+      logStructured('info', 'Payment confirmed and updated', {
         orderId,
         paymentId,
-        amount,
       });
 
-      // TODO: Send WhatsApp notification to customer
-      // TODO: Send notification to kitchen/restaurant
-    } else if (event === 'payment.failed') {
-      const orderId = data.notes?.orderId;
-      const paymentId = data.id;
-
+      // TODO: Trigger WhatsApp notifications here
+    } 
+    else if (event === 'payment.failed') {
       if (orderId) {
         await orderService.updatePaymentStatus(orderId, paymentId, 'FAILED');
-
-        logStructured('info', 'Payment failed', { orderId, paymentId });
-        // TODO: Send failure notification
+        logStructured('info', 'Payment marked as failed', { orderId, paymentId });
       }
     }
 
-\n    return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error) {
-    logStructured('error', 'Razorpay webhook error', { error });
-    return NextResponse.json(errorResponse('Webhook failed', 500), { status: 500 });
-  }
-}
-      }
+    return NextResponse.json({ success: true }, { status: 200 });
 
-      logStructured('info', 'Payment confirmed', {
-        razorpayOrderId,
-        razorpayPaymentId,
-        amount,
-      });
-    }
-
-    return NextResponse.json(
-      {
-        success: true,
-      },
-      { status: 200 }
-    );
   } catch (error) {
-    logStructured('error', 'Razorpay webhook error', { error });
+    logStructured('error', 'Razorpay webhook processing failed', { 
+      message: error instanceof Error ? error.message : 'Unknown error' 
+    });
     return NextResponse.json(errorResponse('Webhook processing failed', 500), { status: 500 });
   }
 }

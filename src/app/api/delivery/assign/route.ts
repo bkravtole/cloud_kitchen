@@ -3,7 +3,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import { DeliveryService } from '@/lib/services/delivery';
-import { OrderService } from '@/lib/services/order';
 import { logStructured, errorResponse, successResponse } from '@/lib/utils';
 import { sseManager } from '@/lib/sse/connectionManager';
 

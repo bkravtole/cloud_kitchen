@@ -22,7 +22,6 @@ export default function KitchenDeliveryDashboard() {
   const [assignments, setAssignments] = useState<DeliveryAssignment[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'connecting'>('disconnected');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [stats, setStats] = useState({ activeDeliveries: 0, pendingOrders: 0, completedToday: 0 });
   const eventSourceRef = useRef<EventSource | null>(null);
   const restaurantIdRef = useRef('rest_001'); // In real app, from auth context
@@ -57,7 +56,6 @@ export default function KitchenDeliveryDashboard() {
 
     eventSource.onopen = () => {
       setConnectionStatus('connected');
-      setError('');
     };
 
     eventSource.onmessage = (event) => {

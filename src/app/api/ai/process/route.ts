@@ -1,7 +1,7 @@
 'use server';
 
 import { NextResponse, NextRequest } from 'next/server';
-import { processUserMessage, filterMenuByPreferences } from '@/lib/services/groq';
+import { processUserMessage } from '@/lib/services/groq';
 import { connectToDatabase } from '@/lib/db/mongodb';
 import { logStructured, errorResponse } from '@/lib/utils';
 import { MenuService } from '@/lib/services/menu';

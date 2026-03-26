@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       price: parseFloat(price),
       category,
       tags: tags || [],
-      spiceLevel: parseInt(spiceLevel) || 3,
+      spiceLevel: (parseInt(spiceLevel) || 3) as 1 | 2 | 3 | 4 | 5,
       serves: parseInt(serves) || 1,
       isAvailable: isAvailable !== false,
       preparationTime: body.preparationTime || 15,

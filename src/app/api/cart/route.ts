@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userPhone, restaurantId, restaurantName, item } = body;
+    const { userPhone, restaurantId, item } = body;
 
     if (!userPhone || !restaurantId || !item) {
       return NextResponse.json(

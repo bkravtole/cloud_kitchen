@@ -102,10 +102,9 @@ function getContext(): RecommendationContext {
  * Main function: Get AI-powered recommendations
  */
 export async function getAdvancedRecommendations(
-  userId: string,
   userPreferences: UserPreferences,
   orderHistory: OrderPattern[],
-  availableMenu: MenuItem[],
+  availableMenu: any[],
   limit: number = 5
 ): Promise<AdvancedRecommendation[]> {
   try {
@@ -262,8 +261,8 @@ Respond with valid JSON (no markdown):
  * Get meal combination recommendations (pairing items that go together)
  */
 export async function getMealCombinations(
-  primaryItem: MenuItem,
-  availableMenu: MenuItem[],
+  primaryItem: any,
+  availableMenu: any[],
   limit: number = 3
 ): Promise<{ items: MenuItem[]; reasoning: string }> {
   try {
@@ -370,7 +369,7 @@ export function analyzeUserPreferences(orderHistory: MenuItem[]): UserPreference
  */
 export async function getTrendingRecommendations(
   allOrders: { itemName: string; count: number }[],
-  availableMenu: MenuItem[],
+  availableMenu: any[],
   limit: number = 5
 ): Promise<AdvancedRecommendation[]> {
   try {

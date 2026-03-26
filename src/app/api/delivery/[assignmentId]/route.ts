@@ -104,7 +104,7 @@ export async function PATCH(
  * Get delivery assignment details
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { assignmentId: string } }
 ) {
   try {

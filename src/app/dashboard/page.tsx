@@ -100,10 +100,15 @@ export default function Dashboard() {
 
   const statusColors: Record<OrderStatus, string> = {
     CREATED: 'bg-yellow-100 text-yellow-800',
+    PAYMENT_PENDING: 'bg-orange-100 text-orange-800',
     CONFIRMED: 'bg-blue-100 text-blue-800',
     PREPARING: 'bg-purple-100 text-purple-800',
     READY: 'bg-green-100 text-green-800',
+    ASSIGNED: 'bg-cyan-100 text-cyan-800',
+    PICKED_UP: 'bg-indigo-100 text-indigo-800',
     DELIVERED: 'bg-gray-100 text-gray-800',
+    CANCELLED: 'bg-red-100 text-red-800',
+    FAILED: 'bg-red-100 text-red-800',
   };
 
   const ordersByStatus = {

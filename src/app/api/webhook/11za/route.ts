@@ -5,7 +5,7 @@ import { connectToDatabase } from '@/lib/db/mongodb';
 import { MenuService } from '@/lib/services/menu';
 import { processUserMessage } from '@/lib/services/groq';
 import { get11zaService } from '@/lib/services/11za';
-import { logStructured, errorResponse, formatPhoneNumber } from '@/lib/utils';
+import { logStructured, formatPhoneNumber } from '@/lib/utils';
 
 // Change '11za' to 'ElevenZa' or 'Webhook11za'
 interface ElevenZaWebhookPayload {
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
        if (suggestedMenuItems.length > 0) {
   // Using backticks allows real line breaks
-  responseMessage += `\n\n*Recommended Items:*\n`;
+  responseMessage += `*Recommended Items:*`;
   suggestedMenuItems.forEach((item, idx) => {
     responseMessage += `${idx + 1}. ${item.name} - ₹${item.price}\n`;
   });

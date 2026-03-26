@@ -106,13 +106,13 @@ export default function OrderTrackingPage() {
     DELIVERED: '🚚',
   };
 
-  const statusColors: Record<string, string> = {
-    CREATED: 'bg-gray-100 text-gray-800',
-    CONFIRMED: 'bg-blue-100 text-blue-800',
-    PREPARING: 'bg-purple-100 text-purple-800',
-    READY: 'bg-green-100 text-green-800',
-    DELIVERED: 'bg-green-100 text-green-800',
-  };
+  // const statusColors: Record<string, string> = {
+  //   CREATED: 'bg-gray-100 text-gray-800',
+  //   CONFIRMED: 'bg-blue-100 text-blue-800',
+  //   PREPARING: 'bg-purple-100 text-purple-800',
+  //   READY: 'bg-green-100 text-green-800',
+  //   DELIVERED: 'bg-green-100 text-green-800',
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
@@ -223,8 +223,8 @@ export default function OrderTrackingPage() {
                             Order #{order.orderId.slice(-8).toUpperCase()}
                           </h2>
                           <p className="text-sm text-gray-600">
-                            {new Date(order.createdAt).toLocaleDateString()} at{' '}
-                            {new Date(order.createdAt).toLocaleTimeString([], {
+                            {new Date(order.createdAt || new Date()).toLocaleDateString()} at{' '}
+                            {new Date(order.createdAt || new Date()).toLocaleTimeString([], {
                               hour: '2-digit',
                               minute: '2-digit',
                             })}

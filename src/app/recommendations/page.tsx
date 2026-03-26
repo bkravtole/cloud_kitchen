@@ -22,7 +22,7 @@ export default function ReorderRecommendationsPage() {
   const [recommendations, setRecommendations] = useState<RecommendationsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedRestaurant, setSelectedRestaurant] = useState('rest_001');
+  const [selectedRestaurant] = useState('rest_001');
   const userPhone = '919876543210'; // From auth context in real app
 
   useEffect(() => {

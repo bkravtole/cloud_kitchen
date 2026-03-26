@@ -33,7 +33,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const db = await connectToDatabase();
+    const { db } = await connectToDatabase();
     const ordersCollection = db.collection('orders');
     const menusCollection = db.collection('menus');
 
