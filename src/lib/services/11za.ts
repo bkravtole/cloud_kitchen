@@ -21,7 +21,7 @@ export class ElevenZaService {
   constructor() {
     this.apiKey = process.env.ELEVENZA_API_KEY || '';
     this.baseUrl = process.env.ELEVENZA_BASE_URL || '';
-    this.originWebsite = process.env['11ZA_ORIGIN_WEBSITE'] || '';
+    this.originWebsite = process.env.ELEVANZA_ORIGIN_WEBSITE || '';
   }
 
   /**

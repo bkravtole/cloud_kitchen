@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "AI-Powered WhatsApp Cloud Kitchen Platform",
   "scripts": {
-    "dev": "next dev",
+   "dev": "NODE_OPTIONS=--no-deprecation next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
