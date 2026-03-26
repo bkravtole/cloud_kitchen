@@ -86,12 +86,13 @@ export async function POST(request: NextRequest) {
           )
         );
 
-        if (suggestedMenuItems.length > 0) {
-          responseMessage += '\n\n*Recommended Items:*\n';
-          suggestedMenuItems.forEach((item, idx) => {
-            responseMessage += `${idx + 1}. ${item.name} - ₹${item.price}\n`;
-          });
-        }
+       if (suggestedMenuItems.length > 0) {
+  // Using backticks allows real line breaks
+  responseMessage += `\n\n*Recommended Items:*\n`;
+  suggestedMenuItems.forEach((item, idx) => {
+    responseMessage += `${idx + 1}. ${item.name} - ₹${item.price}\n`;
+  });
+}
       }
 
       // Send response
