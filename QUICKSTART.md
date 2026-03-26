@@ -30,7 +30,6 @@ Then edit `.env.local` and add your credentials:
 1. Go to https://www.mongodb.com/cloud/atlas
 2. Create cluster (free tier)
 
-4. Add to `.env.local`: `MONGODB_URI=mongodb+srv://...`
 
 ### Get Groq API Key (Required for AI)
 1. Go to https://console.groq.com
