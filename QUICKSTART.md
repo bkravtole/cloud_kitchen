@@ -29,7 +29,7 @@ Then edit `.env.local` and add your credentials:
 ### Get MongoDB URI (Required)
 1. Go to https://www.mongodb.com/cloud/atlas
 2. Create cluster (free tier)
-3. Get connection string: `mongodb+srv://user:pass@cluster.mongodb.net/cloudkitchen`
+
 4. Add to `.env.local`: `MONGODB_URI=mongodb+srv://...`
 
 ### Get Groq API Key (Required for AI)
