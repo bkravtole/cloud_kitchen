@@ -22,16 +22,45 @@ export class ElevenZaService {
     this.baseUrl = process.env.ELEVENZA_BASE_URL || '';
   }
 
+  /**
+   * Format phone number for 11za API
+   * 11za expects: +91XXXXXXXXXX format
+   */
+  private formatPhoneFor11za(phone: string): string {
+    // Remove all non-digits
+    const cleaned = phone.replace(/\D/g, '');
+    
+    // If already 12 digits and starts with 91, add +
+    if (cleaned.length === 12 && cleaned.startsWith('91')) {
+      return `+${cleaned}`;
+    }
+    
+    // If 10 digits (without country code), add +91
+    if (cleaned.length === 10) {
+      return `+91${cleaned}`;
+    }
+    
+    // If already has +, return as is
+    if (phone.startsWith('+')) {
+      return phone;
+    }
+    
+    // Default: try adding +91
+    return `+91${cleaned}`;
+  }
+
   async sendTextMessage(to: string, text: string): Promise<string> {
     try {
+      // Format phone number for 11za - should be +91XXXXXXXXXX
+      const formattedPhone = this.formatPhoneFor11za(to);
       const url = `${this.baseUrl}/sendMessage/sendMessages`;
       
       logStructured('info', '11za sendTextMessage starting', {
-        to,
+        originalPhone: to,
+        formattedPhone,
         textLength: text.length,
         url,
         apiKeyLength: this.apiKey.length,
-        baseUrl: this.baseUrl,
       });
 
       const response = await fetch(url, {
@@ -41,7 +70,7 @@ export class ElevenZaService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          to,
+          to: formattedPhone,
           text,
         }),
       });
@@ -59,13 +88,14 @@ export class ElevenZaService {
           statusText: response.statusText,
           errorBody: errorText.substring(0, 200),
           url,
+          formattedPhone,
         });
         throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
       }
 
       const data: any = await response.json();
       logStructured('info', '11za text message sent', {
-        to,
+        to: formattedPhone,
         messageId: data.messageId,
       });
 
@@ -83,58 +113,84 @@ export class ElevenZaService {
 
   async sendButtonMessage(params: ButtonMessage): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/send_message`, {
+      const formattedPhone = this.formatPhoneFor11za(params.to);
+      const url = `${this.baseUrl}/sendMessage/sendMessages`;
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(params),
+        body: JSON.stringify({
+          ...params,
+          to: formattedPhone,
+        }),
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        logStructured('error', '11za button API error', {
+          status: response.status,
+          errorBody: errorText.substring(0, 200),
+        });
         throw new Error(`HTTP ${response.status}`);
       }
 
       const data: any = await response.json();
       logStructured('info', '11za button message sent', {
-        to: params.to,
+        to: formattedPhone,
         messageId: data.messageId,
         buttonCount: params.buttons.length,
       });
 
       return data.messageId;
-    } catch (error) {
-      logStructured('error', '11za button send error', { error });
+    } catch (error: any) {
+      logStructured('error', '11za button send error', { 
+        error: error?.message || String(error)
+      });
       throw error;
     }
   }
 
   async sendListMessage(params: ListMessage): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/send_message`, {
+      const formattedPhone = this.formatPhoneFor11za(params.to);
+      const url = `${this.baseUrl}/sendMessage/sendMessages`;
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(params),
+        body: JSON.stringify({
+          ...params,
+          to: formattedPhone,
+        }),
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        logStructured('error', '11za list API error', {
+          status: response.status,
+          errorBody: errorText.substring(0, 200),
+        });
         throw new Error(`HTTP ${response.status}`);
       }
 
       const data: any = await response.json();
       logStructured('info', '11za list message sent', {
-        to: params.to,
+        to: formattedPhone,
         messageId: data.messageId,
         rowCount: params.rows.length,
       });
 
       return data.messageId;
-    } catch (error) {
-      logStructured('error', '11za list send error', { error });
+    } catch (error: any) {
+      logStructured('error', '11za list send error', { 
+        error: error?.message || String(error)
+      });
       throw error;
     }
   }
